@@ -7,13 +7,11 @@ class ApiService {
   static const String _apiEndpoint =
       'https://api.openai.com/v1/engines/davinci/completions';
 
-  Future<String> getDatePlan(Map<String, String> inputData) async {
-    final prompt = 'デートプラン:\n'
-        '天候: ${inputData['天候']}\n'
-        '場所: ${inputData['場所']}\n'
-        '気温: ${inputData['気温']}\n'
-        'その他の情報: ${inputData['その他の情報']}\n'
-        'プラン:';
+  Future<String> getDatePlan(Map<String, String> inputMap) async {
+    final dateInfo = inputMap.entries
+        .map((entry) => '${entry.key}: ${entry.value}')
+        .join('\n');
+    final prompt = 'デートプラン:\n$dateInfo\nプラン:';
     final response = await getGptResponse(prompt);
     return response;
   }

@@ -4,6 +4,10 @@ import 'api_service.dart';
 class DatePlanningInputFields extends StatefulWidget {
   final ApiService apiService;
   final Future<String> Function(Map<String, String>) apiFunction;
+  String defaultWeather = '天候：';
+  String defaultLocation = '場所：';
+  String defaultTemperature = '気温：';
+  String defaultAdditionalInfo = 'その他の情報：';
 
   DatePlanningInputFields({
     required this.apiService,
@@ -16,10 +20,10 @@ class DatePlanningInputFields extends StatefulWidget {
 }
 
 class _DatePlanningInputFieldsState extends State<DatePlanningInputFields> {
-  late TextEditingController _weatherController;
-  late TextEditingController _locationController;
-  late TextEditingController _temperatureController;
-  late TextEditingController _additionalInfoController;
+  TextEditingController _weatherController = TextEditingController();
+  TextEditingController _locationController = TextEditingController();
+  TextEditingController _temperatureController = TextEditingController();
+  TextEditingController _additionalInfoController = TextEditingController();
   String _outputText = '';
   bool _isLoading = false;
 
@@ -41,27 +45,50 @@ class _DatePlanningInputFieldsState extends State<DatePlanningInputFields> {
     super.dispose();
   }
 
+  String createPrompt(String weather, String location, String temperature,
+      String additionalInfo) {
+    return 'あなたはデートプランニングのエキスパートです。以下の情報をもとに、楽しく過ごせるデートプランを3つ提案してください。\n\n' +
+        '天候: $weather\n' +
+        '行きたい場所: $location\n' +
+        '気温: $temperature\n' +
+        'その他の情報: $additionalInfo\n\n' +
+        'それぞれのデートプランは、以下の形式で提案してください：\n\n' +
+        '1. デートプラン1の概要\n' +
+        '  - アクティビティ1\n' +
+        '  - アクティビティ2\n' +
+        '  - アクティビティ3\n\n' +
+        '2. デートプラン2の概要\n' +
+        '  - アクティビティ1\n' +
+        '  - アクティビティ2\n' +
+        '  - アクティビティ3\n\n' +
+        '3. デートプラン3の概要\n' +
+        '  - アクティビティ1\n' +
+        '  - アクティビティ2\n' +
+        '  - アクティビティ3';
+  }
+
   Future<void> _sendRequest(
       Future<String> Function(Map<String, String>) apiFunction) async {
     setState(() {
       _isLoading = true;
     });
 
-    final inputData = {
-      '天候': _weatherController.text,
-      '場所': _locationController.text,
-      '気温': _temperatureController.text,
-      'その他の情報': _additionalInfoController.text,
-    };
+    String weather = _weatherController.text;
+    String location = _locationController.text;
+    String temperature = _temperatureController.text;
+    String additionalInfo = _additionalInfoController.text;
+
+    String prompt =
+        createPrompt(weather, location, temperature, additionalInfo);
 
     try {
-      final outputText = await apiFunction(inputData);
+      final outputText = await widget.apiFunction({"inputText": prompt});
       setState(() {
         _outputText = outputText;
       });
     } catch (error) {
       setState(() {
-        _outputText = 'エラーが発生しました: ${error.toString()}';
+        _outputText = 'エラーが発生しました。もう一度お試しください。';
       });
     } finally {
       setState(() {
@@ -135,7 +162,7 @@ class _DatePlanningInputFieldsState extends State<DatePlanningInputFields> {
         SizedBox(height: 16),
         Center(
           child: ElevatedButton(
-            onPressed: () => _sendRequest(widget.apiFunction), // ここを修正
+            onPressed: () => _sendRequest(widget.apiFunction),
             child: Text('デートプランニングしてもらう'),
           ),
         ),
