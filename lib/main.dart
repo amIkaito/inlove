@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'templates.dart';
+import 'date_planning_input_fields.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -29,6 +31,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
+  String _outputText = '';
+  bool _isLoading = false;
   ApiService _apiService = ApiService();
   late TabController _tabController;
   TextEditingController _inputController = TextEditingController();
@@ -47,22 +51,25 @@ class _MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
-  Future<void> _sendRequest(Function apiFunction) async {
-    String input = _inputController.text;
-    if (input.isNotEmpty) {
+  Future<void> _sendRequest(Future<String> Function(String) apiFunction) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final inputText = _inputController.text;
+    try {
+      final outputText = await apiFunction(inputText);
       setState(() {
-        _responseText = 'Loading...';
+        _outputText = outputText;
       });
-      try {
-        String result = await apiFunction(input);
-        setState(() {
-          _responseText = result;
-        });
-      } catch (e) {
-        setState(() {
-          _responseText = 'Error: $e';
-        });
-      }
+    } catch (error) {
+      setState(() {
+        _outputText = 'エラーが発生しました。もう一度お試しください。';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -71,16 +78,16 @@ class _MyHomePageState extends State<MyHomePage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_tabController.index == 0) _buildTemplateDropdown(),
-        TextField(
-          controller: _inputController,
-          minLines: 3,
-          maxLines: 5,
-          decoration: InputDecoration(
-            hintText: 'Enter your love problem or date info',
-            border: OutlineInputBorder(),
+        if (_tabController.index == 0)
+          TextField(
+            controller: _inputController,
+            minLines: 3,
+            maxLines: 5,
+            decoration: InputDecoration(
+              hintText: '悩んでいることや解決したいことを入力してください',
+              border: OutlineInputBorder(),
+            ),
           ),
-        ),
       ],
     );
   }
@@ -94,7 +101,10 @@ class _MyHomePageState extends State<MyHomePage>
         String key = entry.key;
         return DropdownMenuItem<String>(
           value: key,
-          child: Text(key),
+          child: SelectableText(
+            key,
+            style: TextStyle(fontSize: 16),
+          ),
         );
       }).toList(),
       onChanged: (newValue) {
@@ -121,6 +131,8 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
+//デートプランニングの入力フィールド
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,47 +146,43 @@ class _MyHomePageState extends State<MyHomePage>
           ],
         ),
       ),
-      body: Column(
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      'Input:',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'Input:',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        _buildInputField(),
+                        SizedBox(height: 16),
+                        _buildOutputField(),
+                      ],
                     ),
-                    _buildInputField(),
-                    SizedBox(height: 16),
-                    _buildOutputField(),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => _sendRequest(
+                      (inputText) => _apiService.getLoveAdvice(inputText)),
+                  child: Text('恋愛相談する'),
+                ),
+              ),
+            ],
           ),
-          Container(
-            height: 60,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () => _sendRequest(_apiService.getLoveAdvice),
-                    child: Text('恋愛相談する'),
-                  ),
-                ),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () => _sendRequest(_apiService.getDatePlan),
-                    child: Text('デートをプランニングしてもらう'),
-                  ),
-                ),
-              ],
-            ),
+          DatePlanningInputFields(
+            apiService: _apiService,
+            apiFunction: _apiService.getDatePlan,
           ),
         ],
       ),

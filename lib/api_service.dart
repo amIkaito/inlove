@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class ApiService {
   static const String _apiKey =
-      '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';
+      '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';
   static const String _apiEndpoint =
       'https://api.openai.com/v1/engines/davinci/completions';
 
-  Future<String> getDatePlan(String dateInfo) async {
-    final prompt = 'デートプラン: $dateInfo\nプラン:';
+  Future<String> getDatePlan(Map<String, String> inputData) async {
+    final prompt = 'デートプラン:\n'
+        '天候: ${inputData['天候']}\n'
+        '場所: ${inputData['場所']}\n'
+        '気温: ${inputData['気温']}\n'
+        'その他の情報: ${inputData['その他の情報']}\n'
+        'プラン:';
     final response = await getGptResponse(prompt);
     return response;
   }
