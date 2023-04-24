@@ -11,7 +11,8 @@ class ApiService {
     final dateInfo = inputMap.entries
         .map((entry) => '${entry.key}: ${entry.value}')
         .join('\n');
-    final prompt = 'デートプラン:\n$dateInfo\nプラン:';
+    final prompt =
+        'あなたはデートプランニングのエキスパートです。以下の情報をもとに、楽しく過ごせるデートプランを3つ提案してください。\n\n$dateInfo\n\nそれぞれのデートプランは、以下の形式で提案してください：\n\n1. デートプラン1の概要:\n  1-1. アクティビティ1:\n  1-2. アクティビティ2:\n  1-3. アクティビティ3:\n\n2. デートプラン2の概要:\n  2-1. アクティビティ1:\n  2-2. アクティビティ2:\n  2-3. アクティビティ3:\n\n3. デートプラン3の概要:\n  3-1. アクティビティ1:\n  3-2. アクティビティ2:\n  3-3. アクティビティ3:';
     final response = await getGptResponse(prompt);
     return response;
   }
@@ -30,10 +31,10 @@ class ApiService {
 
     final body = jsonEncode({
       'prompt': prompt,
-      'max_tokens': 100,
-      'n': 1,
+      'max_tokens': 150, // ここを変更アア
+      'n': 3,
       'stop': null,
-      'temperature': 0.8,
+      'temperature': 0.5,
     });
 
     final response = await http.post(
@@ -45,6 +46,7 @@ class ApiService {
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
       final generatedText = jsonResponse['choices'][0]['text'];
+      print(jsonResponse);
       return generatedText.trim();
     } else {
       throw Exception('Failed to load GPT response');
