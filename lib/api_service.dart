@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String _apiKey =
-      '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';
+      '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';
   static const String _apiEndpoint =
       'https://api.openai.com/v1/chat/completions';
 

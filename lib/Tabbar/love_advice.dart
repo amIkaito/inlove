@@ -32,7 +32,6 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
         '相談内容: 初デートのプラン\nデートの相手の性格や趣味: [入力してください]\n自分の性格や特徴: [入力してください]\n考えているデートプラン: [ユーザー入力]\n質問: このデートプランは適切ですか？他に良いデートプランの提案はありますか？',
     'デート後のフォローアップについての相談':
         '相談内容: デート後のフォローアップ\nデートの内容や相手の反応: [入力してください]\n自分の感想や不安: [入力してください]\n質問: デート後のフォローアップはどのように行うべきですか？具体的なアドバイスが欲しいです。',
-    'カスタマイズ': '',
   };
   // 以前に提供されたコードを追加
   @override
@@ -98,7 +97,7 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
 
   Widget _buildTemplateDropdown() {
     return DropdownButton<String>(
-      hint: Text("Select template"),
+      hint: Text("悩みごとを選択してください"),
       value: _selectedLoveAdviceTemplate,
       items: loveAdviceTemplates.entries.map((entry) {
         String key = entry.key;
@@ -121,35 +120,65 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Input:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent, Colors.pinkAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Input:',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'DancingScript',
+                          color: Colors.white,
+                        ),
+                      ),
+                      _buildInputField(),
+                      SizedBox(height: 16),
+                      _buildOutputField(),
+                    ],
                   ),
-                  _buildInputField(),
-                  SizedBox(height: 16),
-                  _buildOutputField(),
-                ],
+                ),
               ),
             ),
-          ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () => _sendRequest(
+                    (inputText) => widget.apiService.getLoveAdvice(inputText)),
+                child: Text('恋愛相談する'),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  onPrimary: Colors.pinkAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  textStyle: TextStyle(
+                    fontSize: 20,
+                    fontFamily: 'DancingScript',
+                    fontWeight: FontWeight.bold,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+          ],
         ),
-        Center(
-          child: ElevatedButton(
-            onPressed: () => _sendRequest(
-                (inputText) => widget.apiService.getLoveAdvice(inputText)),
-            child: Text('恋愛相談する'),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

@@ -50,9 +50,25 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            fontFamily: 'DancingScript',
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.blueAccent,
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Colors.pinkAccent,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white.withOpacity(0.7),
+          labelStyle: TextStyle(
+            fontFamily: 'DancingScript',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
           tabs: [
             Tab(text: '恋愛相談'),
             Tab(text: 'デートプランニング'),
