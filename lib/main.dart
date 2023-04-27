@@ -13,7 +13,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'GPT Love & Date Planner',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blueGrey,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        ),
+        scaffoldBackgroundColor: Colors.pinkAccent,
       ),
       home: MyHomePage(title: '恋愛相談andデートプランニング'),
     );
@@ -58,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage>
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.pinkAccent,

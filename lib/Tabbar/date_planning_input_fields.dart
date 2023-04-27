@@ -176,225 +176,247 @@ class _DatePlanningInputFieldsState extends State<DatePlanningInputFields> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DropdownButton<String>(
-              value: _selectedWeather,
-              hint: Text('天候を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedWeather = newValue;
-                });
-              },
-              items: <String>['晴れ', '曇り', '雨', '雪']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedTemperature,
-              hint: Text('気温を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedTemperature = newValue;
-                });
-              },
-              items: <String>['寒い', '涼しい', '適温', '暖かい', '暑い']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedMaleAge,
-              hint: Text('男性の年齢を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedMaleAge = newValue;
-                });
-              },
-              items: List<String>.generate(100, (i) => (i + 18).toString())
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedFemaleAge,
-              hint: Text('女性の年齢を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedFemaleAge = newValue;
-                });
-              },
-              items: List<String>.generate(100, (i) => (i + 18).toString())
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedDatePurpose,
-              hint: Text('デートの目的を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedDatePurpose = newValue;
-                });
-              },
-              items: <String>['友達として', '恋人として', '結婚を考える相手として']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedBudget,
-              hint: Text('予算を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedBudget = newValue;
-                });
-              },
-              items: <String>[
-                '5,000円以下',
-                '5,000円～10,000円',
-                '10,000円～20,000円',
-                '20,000円以上'
-              ].map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedStartTime,
-              hint: Text('デート開始時間を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedStartTime = newValue;
-                });
-              },
-              items: <String>['午前中', '昼', '夕方', '夜']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            DropdownButton<String>(
-              value: _selectedDuration,
-              hint: Text('デート所要時間を選択'),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedDuration = newValue;
-                });
-              },
-              items: <String>['1時間', '2時間', '3時間', '半日', '1日']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            SizedBox(height: 8),
-            Text(
-              '行きたい場所:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: _locationController,
-              decoration: InputDecoration(
-                hintText: 'デートの場所 (例: 東京タワー)',
-                border: OutlineInputBorder(),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent, Colors.pinkAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DropdownButton<String>(
+                value: _selectedWeather,
+                hint: Text('天候を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedWeather = newValue;
+                  });
+                },
+                items: <String>['晴れ', '曇り', '雨', '雪']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'その他の情報:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: _additionalInfoController,
-              decoration: InputDecoration(
-                hintText: '特別なイベント(例:誕生日 クリスマス)',
-                border: OutlineInputBorder(),
+              SizedBox(height: 8),
+              DropdownButton<String>(
+                value: _selectedTemperature,
+                hint: Text('気温を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedTemperature = newValue;
+                  });
+                },
+                items: <String>['寒い', '涼しい', '適温', '暖かい', '暑い']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              '趣味:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: _hobbiesController,
-              decoration: InputDecoration(
-                hintText: '映画鑑賞、カフェ巡り、アウトドアなど',
-                border: OutlineInputBorder(),
+              SizedBox(height: 8),
+              DropdownButton<String>(
+                value: _selectedMaleAge,
+                hint: Text('男性の年齢を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedMaleAge = newValue;
+                  });
+                },
+                items: List<String>.generate(100, (i) => (i + 18).toString())
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'デートで避けたいもの:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              controller: _avoidController,
-              decoration: InputDecoration(
-                hintText: '過度な運動など',
-                border: OutlineInputBorder(),
+              SizedBox(height: 8),
+              DropdownButton<String>(
+                value: _selectedFemaleAge,
+                hint: Text('女性の年齢を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedFemaleAge = newValue;
+                  });
+                },
+                items: List<String>.generate(100, (i) => (i + 18).toString())
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-            ),
-            SizedBox(height: 16),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => _sendRequest(),
-                child: Text('デートプランニングしてもらう'),
+              SizedBox(height: 8),
+              DropdownButton<String>(
+                value: _selectedDatePurpose,
+                hint: Text('デートの目的を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedDatePurpose = newValue;
+                  });
+                },
+                items: <String>['友達として', '恋人として', '結婚を考える相手として']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Output:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            Container(
-              padding: EdgeInsets.all(16),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
+              SizedBox(height: 8),
+              DropdownButton<String>(
+                value: _selectedBudget,
+                hint: Text('予算を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedBudget = newValue;
+                  });
+                },
+                items: <String>[
+                  '5,000円以下',
+                  '5,000円～10,000円',
+                  '10,000円～20,000円',
+                  '20,000円以上'
+                ].map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-              child: _isLoading
-                  ? CircularProgressIndicator()
-                  : Text(
-                      _outputText,
-                      style: TextStyle(fontSize: 16),
+              SizedBox(height: 8),
+              DropdownButton<String>(
+                value: _selectedStartTime,
+                hint: Text('デート開始時間を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedStartTime = newValue;
+                  });
+                },
+                items: <String>['午前中', '昼', '夕方', '夜']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 8),
+              DropdownButton<String>(
+                value: _selectedDuration,
+                hint: Text('デート所要時間を選択'),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedDuration = newValue;
+                  });
+                },
+                items: <String>['1時間', '2時間', '3時間', '半日', '1日']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 8),
+              Text(
+                '行きたい場所:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: _locationController,
+                decoration: InputDecoration(
+                  hintText: 'デートの場所 (例: 東京タワー)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'その他の情報:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: _additionalInfoController,
+                decoration: InputDecoration(
+                  hintText: '特別なイベント(例:誕生日 クリスマス)',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                '趣味:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: _hobbiesController,
+                decoration: InputDecoration(
+                  hintText: '映画鑑賞、カフェ巡り、アウトドアなど',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'デートで避けたいもの:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                controller: _avoidController,
+                decoration: InputDecoration(
+                  hintText: '過度な運動など',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => _sendRequest(),
+                  child: Text('デートプランニングしてもらう'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    onPrimary: Colors.pinkAccent,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    textStyle: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'DancingScript',
+                      fontWeight: FontWeight.bold,
                     ),
-            ),
-          ],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Output:',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              Container(
+                padding: EdgeInsets.all(16),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: _isLoading
+                    ? CircularProgressIndicator()
+                    : Text(
+                        _outputText,
+                        style: TextStyle(fontSize: 16),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );

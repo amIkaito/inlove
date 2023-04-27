@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 import '../api_service.dart';
 
 class LoveAdvicePage extends StatefulWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'GPT Love & Date Planner',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blueGrey,
+        popupMenuTheme: ThemeData.light().popupMenuTheme.copyWith(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+      ),
+    );
+  }
+
   final ApiService apiService;
 
   LoveAdvicePage({required this.apiService});
@@ -73,13 +89,23 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextField(
-          controller: _inputController,
-          minLines: 3,
-          maxLines: 5,
-          decoration: InputDecoration(
-            hintText: '悩んでいることや解決したいことを入力してください',
-            border: OutlineInputBorder(),
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(5),
+            child: TextField(
+              controller: _inputController,
+              minLines: 1,
+              maxLines: 10,
+              decoration: InputDecoration(
+                labelText: "相談内容",
+                border: InputBorder.none, // 下線を非表示にする
+              ),
+            ),
           ),
         ),
         SizedBox(height: 16), // この行を追加
@@ -96,25 +122,65 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
   }
 
   Widget _buildTemplateDropdown() {
-    return DropdownButton<String>(
-      hint: Text("悩みごとを選択してください"),
-      value: _selectedLoveAdviceTemplate,
-      items: loveAdviceTemplates.entries.map((entry) {
-        String key = entry.key;
-        return DropdownMenuItem<String>(
-          value: key,
-          child: SelectableText(
-            key,
-            style: TextStyle(fontSize: 16),
+    return Center(
+      child: Container(
+        padding: EdgeInsets.all(5), // パディングを追加
+        decoration: BoxDecoration(
+          color: Colors.white, // 背景色を設定
+          borderRadius: BorderRadius.circular(30.0), // 角丸を設定
+        ),
+        child: Center(
+          child: DropdownButton<String>(
+            underline: Container(
+              height: 0,
+              color: Colors.transparent,
+            ),
+            elevation: 16,
+            hint: Text(
+              "悩みごとを選択してください",
+              style: TextStyle(
+                color: Colors.black45,
+                fontSize: 16,
+                fontFamily: 'DancingScript',
+              ),
+            ),
+            value: _selectedLoveAdviceTemplate,
+            dropdownColor: Colors.white,
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: 'DancingScript',
+              fontWeight: FontWeight.bold,
+              color: Colors.pinkAccent,
+            ),
+            items: loveAdviceTemplates.entries.map((entry) {
+              String key = entry.key;
+              return DropdownMenuItem<String>(
+                value: key,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                  ),
+                  child: SelectableText(
+                    key,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'DancingScript',
+                      color: Colors.pinkAccent,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+            onChanged: (newValue) {
+              setState(() {
+                _selectedLoveAdviceTemplate = newValue;
+                _inputController.text = loveAdviceTemplates[newValue] ?? '';
+              });
+            },
           ),
-        );
-      }).toList(),
-      onChanged: (newValue) {
-        setState(() {
-          _selectedLoveAdviceTemplate = newValue;
-          _inputController.text = loveAdviceTemplates[newValue] ?? '';
-        });
-      },
+        ),
+      ),
     );
   }
 
@@ -138,15 +204,6 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        'Input:',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'DancingScript',
-                          color: Colors.white,
-                        ),
-                      ),
                       _buildInputField(),
                       SizedBox(height: 16),
                       _buildOutputField(),
@@ -157,8 +214,13 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
             ),
             Center(
               child: ElevatedButton(
-                onPressed: () => _sendRequest(
-                    (inputText) => widget.apiService.getLoveAdvice(inputText)),
+                onPressed: () async {
+                  await _sendRequest((inputText) =>
+                      widget.apiService.getLoveAdvice(inputText));
+
+                  // 相談内容をリセット
+                  _inputController.clear();
+                },
                 child: Text('恋愛相談する'),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.white,
