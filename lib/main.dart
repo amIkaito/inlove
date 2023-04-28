@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'Tabbar/date_planning_input_fields.dart';
 import 'Tabbar/love_advice.dart'; // 追加: import LoveAdvicePage
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,6 +18,11 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.blueGrey,
         appBarTheme: AppBarTheme(
           backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        ),
+        popupMenuTheme: PopupMenuThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
         ),
         scaffoldBackgroundColor: Colors.pinkAccent,
       ),

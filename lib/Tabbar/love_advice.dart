@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../api_service.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoveAdvicePage extends StatefulWidget {
   @override
@@ -7,13 +8,7 @@ class LoveAdvicePage extends StatefulWidget {
     return MaterialApp(
       title: 'GPT Love & Date Planner',
       theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blueGrey,
-        popupMenuTheme: ThemeData.light().popupMenuTheme.copyWith(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
+        primarySwatch: Colors.blue,
       ),
     );
   }
@@ -34,6 +29,7 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
   String _responseText = '';
   String? _selectedLoveAdviceTemplate;
   late TabController _tabController; // この行を追加
+  bool _loading = false;
 
   Map<String, String> loveAdviceTemplates = {
     'アプローチ方法についての相談':
@@ -62,25 +58,27 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
     super.dispose();
   }
 
-  Future<void> _sendRequest(Future<String> Function(String) apiFunction) async {
+  Future<void> _sendRequest(
+      Future<String> Function(String inputText) requestHandler) async {
+    String inputText = _inputController.text.trim();
+    if (inputText.isEmpty) return;
+
     setState(() {
-      _isLoading = true;
+      _loading = true;
     });
 
-    final inputText = _inputController.text;
     try {
-      final outputText = await apiFunction(inputText);
+      String outputText = await requestHandler(inputText);
       setState(() {
         _outputText = outputText;
       });
-    } catch (error) {
-      print('Error: $error'); // 追加: エラー内容を出力
+    } catch (e) {
       setState(() {
         _outputText = 'エラーが発生しました。もう一度お試しください。';
       });
     } finally {
       setState(() {
-        _isLoading = false;
+        _loading = false;
       });
     }
   }
@@ -109,22 +107,53 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
           ),
         ),
         SizedBox(height: 16), // この行を追加
-        _buildTemplateDropdown(), // この行を追加
       ],
     );
   }
 
   Widget _buildOutputField() {
-    return Text(
-      _outputText,
-      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    return Container(
+      width: 400,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                '恋愛先生',
+                style: TextStyle(
+                  color: Colors.pinkAccent,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              SizedBox(width: 8), // 恋愛先生の名前とローディングインジケータの間にスペースを追加
+              if (_loading)
+                LoadingAnimationWidget.threeArchedCircle(
+                  color: Colors.pinkAccent,
+                  size: 22,
+                ),
+            ],
+          ),
+          SizedBox(height: 8), // 恋愛先生の名前と回答の間にスペースを追加
+          Text(
+            _outputText,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildTemplateDropdown() {
     return Center(
       child: Container(
-        padding: EdgeInsets.all(5), // パディングを追加
+        padding: EdgeInsets.all(8), // パディングを追加
         decoration: BoxDecoration(
           color: Colors.white, // 背景色を設定
           borderRadius: BorderRadius.circular(30.0), // 角丸を設定
@@ -158,7 +187,7 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
                 value: key,
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(20),
                     color: Colors.white,
                   ),
                   child: SelectableText(
@@ -186,59 +215,70 @@ class _LoveAdvicePageState extends State<LoveAdvicePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blueAccent, Colors.pinkAccent],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blueAccent, Colors.pinkAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _buildInputField(),
-                      SizedBox(height: 16),
-                      _buildOutputField(),
-                    ],
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(height: 16),
+                        _buildTemplateDropdown(), // この行を追加
+                        SizedBox(height: 18),
+                        _buildInputField(),
+                        SizedBox(height: 32),
+                        _buildOutputField(),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  await _sendRequest((inputText) =>
-                      widget.apiService.getLoveAdvice(inputText));
+              SizedBox(height: 16),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _loading // _loadingがtrueの場合、ボタンを無効化する
+                      ? null
+                      : () async {
+                          await _sendRequest((inputText) =>
+                              widget.apiService.getLoveAdvice(inputText));
 
-                  // 相談内容をリセット
-                  _inputController.clear();
-                },
-                child: Text('恋愛相談する'),
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.white,
-                  onPrimary: Colors.pinkAccent,
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                  textStyle: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'DancingScript',
-                    fontWeight: FontWeight.bold,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                          // 相談内容をリセット
+                          _inputController.clear();
+                        },
+                  child: Text('恋愛相談する'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    onPrimary: Colors.pinkAccent,
+                    padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                    textStyle: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'DancingScript',
+                      fontWeight: FontWeight.bold,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-          ],
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
