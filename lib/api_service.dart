@@ -1,37 +1,63 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class ApiService {
   static const String _apiKey =
-      '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';
+      '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';
   static const String _apiEndpoint =
-      'https://api.openai.com/v1/engines/davinci/completions';
+      'https://api.openai.com/v1/chat/completions';
 
-  Future<String> getDatePlan(String dateInfo) async {
-    final prompt = 'デートプラン: $dateInfo\nプラン:';
-    final response = await getGptResponse(prompt);
+  Future<String> getDatePlan(Map<String, String> inputMap) async {
+    final dateInfo = inputMap.entries
+        .map((entry) => '${entry.key}: ${entry.value}')
+        .join('\n');
+
+    final List<Map<String, String>> messages = [
+      {
+        'role': 'system',
+        'content':
+            'あなたはデートプランニングのエキスパートです。以下の情報をもとに、楽しいデートプランを2つ提案してください。\n\n$dateInfo\n\nそれぞれのデートプランは、以下の形式で提案してください：\n\n'
+                'プラン1:\n'
+                '  概要:\n'
+                '  1つ目の行動:\n'
+                '  2つ目の行動:\n'
+                '  3つ目の行動:\n\n'
+                'プラン2:\n'
+                '  概要:\n'
+                '  1つ目の行動:\n'
+                '  2つ目の行動:\n'
+                '  3つ目の行動:\n\n'
+      },
+      {'role': 'user', 'content': dateInfo}
+    ];
+
+    final response = await getGptResponse(messages);
     return response;
   }
 
   Future<String> getLoveAdvice(String problem) async {
-    final prompt = '恋愛相談: $problem\nアドバイス:';
-    final response = await getGptResponse(prompt);
+    final List<Map<String, String>> messages = [
+      {'role': 'system', 'content': 'あなたは恋愛のエキスパートです。以下の恋愛相談に答えてください。'},
+      {'role': 'user', 'content': problem}
+    ];
+
+    final response = await getGptResponse(messages);
     return response;
   }
 
-  Future<String> getGptResponse(String prompt) async {
+  Future<String> getGptResponse(List<Map<String, String>> messages) async {
     final headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $_apiKey'
     };
 
+    print('Messages: $messages');
+
     final body = jsonEncode({
-      'prompt': prompt,
-      'max_tokens': 100,
-      'n': 1,
-      'stop': null,
-      'temperature': 0.8,
+      'model': 'gpt-3.5-turbo',
+      'messages': messages,
+      'max_tokens': 700,
+      'temperature': 0.7,
     });
 
     final response = await http.post(
@@ -42,9 +68,10 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
-      final generatedText = jsonResponse['choices'][0]['text'];
+      final generatedText = jsonResponse['choices'][0]['message']['content'];
       return generatedText.trim();
     } else {
+      print('Error response: ${response.body}');
       throw Exception('Failed to load GPT response');
     }
   }
